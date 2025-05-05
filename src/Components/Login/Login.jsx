@@ -1,5 +1,5 @@
- import { signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+ import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react';
 import {auth} from '../../firebase.init';
 
  
@@ -7,6 +7,7 @@ import {auth} from '../../firebase.init';
 
   const[success, setSuccess] = useState(false)
   const [loginError, setLoginError] = useState('');
+  const emailRef = useRef();
 
     const handleLogin = e =>{
         e.preventDefault();
@@ -40,6 +41,25 @@ import {auth} from '../../firebase.init';
             setLoginError(error.message);
         })
     }
+
+    const handleForgetPassword = () =>{
+
+      console.log('get me email address', emailRef.current.value);
+      const email = emailRef.current.value;
+
+      if(!email){
+
+        console.log('please provide a valid email address')
+      }
+      else{
+
+        sendPasswordResetEmail(auth, email)
+        .then(() =>{
+
+          alert('Password Reset email sent,please check your email ')
+        })
+      }
+    }
     return (
         <div className="hero bg-base-200 min-h-screen">
   <div className="hero-content flex-col lg:flex-row-reverse">
@@ -54,10 +74,12 @@ import {auth} from '../../firebase.init';
       <form onSubmit={handleLogin} className="card-body">
         <fieldset className="fieldset">
           <label className="label">Email</label>
-          <input type="email" name='email' className="input" placeholder="Email" />
+          <input type="email" name='email' ref={emailRef} className="input" placeholder="Email" />
           <label className="label">Password</label>
           <input type="password" name='password' className="input" placeholder="Password" />
+          <label onClick={handleForgetPassword} className='label'>
           <div><a className="link link-hover">Forgot password?</a></div>
+          </label>
           <button className="btn btn-neutral mt-4">Login</button>
         </fieldset>
       </form>
